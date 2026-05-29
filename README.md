@@ -1,51 +1,158 @@
-# Frontend Next.js con Supabase directo
+# Bar El Jardin - Carta Digital
 
-Este proyecto usa solo frontend (Next.js) para consultar datos directamente desde Supabase y mostrarlos en la web.
+Aplicacion web para gestionar y mostrar la carta digital de un restaurante.
 
-## Arquitectura
+El proyecto incluye:
 
-- Frontend: Next.js (App Router)
-- Datos: Supabase REST API con claves publicas de entorno
+- Home visual tipo landing con carrusel de categorias.
+- Vista de detalle por categoria con platos y video vertical corto (aprox. 5 segundos).
+- Panel de administracion para gestionar categorias, platos y activos multimedia.
+- Soporte de idioma (auto y manual) para la experiencia de usuario.
+- Integracion directa con Supabase para datos y almacenamiento.
 
-No hay backend Python ni capa intermedia `/api/*` en esta configuracion.
+Toda la informacion funcional del proyecto se guarda en Supabase:
 
-## Variables de entorno
+- Base de datos: categorias, platos, horarios, testimonios y textos.
+- Storage: imagenes de categorias y videos de platos.
 
-Configura estas variables en `.env.local`:
+## Para que sirve este proyecto
 
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `NEXT_PUBLIC_SUPABASE_MENU_IMAGES_BUCKET=menu-images`
-- `NEXT_PUBLIC_SUPABASE_MENU_ITEM_VIDEOS_BUCKET=menu-item-videos`
+Sirve para publicar una carta moderna, visual y editable sin backend propio tradicional.
 
-## Desarrollo local
+La idea es que el negocio pueda:
+
+- Actualizar contenido desde un panel web (`/admin`).
+- Organizar categorias y subplatos con orden y estado activo/inactivo.
+- Mostrar videos e imagenes alojados en Supabase Storage.
+- Desplegar rapido en Vercel.
+
+## Stack tecnico
+
+- Next.js (App Router)
+- React + TypeScript
+- Tailwind CSS
+- Framer Motion
+- Supabase (Database + Storage + Auth)
+
+## Arquitectura resumida
+
+- Frontend puro con Next.js.
+- Lectura de datos desde cliente en `src/lib/supabase-public.ts`.
+- Operaciones de administracion con cliente de admin en `src/lib/supabase-admin.ts`.
+- Sin backend Python ni capa intermedia `api/*`.
+
+## Requisitos previos
+
+- Node.js 20 o superior
+- npm
+- Proyecto de Supabase creado y accesible
+
+## Puesta en marcha (local)
+
+1. Clona el repositorio.
+2. Entra en la carpeta del proyecto.
+3. Instala dependencias.
+4. Crea el archivo `.env.local`.
+5. Ejecuta el entorno de desarrollo.
 
 ```bash
 npm install
 npm run dev
 ```
 
-Frontend: `http://localhost:3000`
+Aplicacion local:
 
-## Capa de datos
+- `http://localhost:3000`
 
-El acceso de lectura esta en `src/lib/supabase-public.ts`.
+## Variables de entorno
 
-La home social consume:
+Usa `.env.example` como plantilla y copialo a `.env.local`.
 
-- `site_settings`
-- `menu_cards`
-- `menu_items`
-- `testimonials`
-- `business_hours`
+Ejemplo (Windows PowerShell):
 
-Al hacer click en una categoria (`menu_cards.href`), la app resuelve una vista de detalle con los platos (`menu_items`) asociados a esa card.
+```powershell
+Copy-Item .env.example .env.local
+```
 
-## Idiomas (auto/manual)
+Ejemplo (macOS/Linux):
 
-- Selector de idioma en la esquina superior derecha de la home social.
-- Modo `AUTO` (detecta idioma del navegador) y modos manuales `ES`, `US`, `GB`, `FR`, `IT`.
-- La preferencia se persiste en `localStorage` y en query param `lang` para mantenerla en la navegacion.
+```bash
+cp .env.example .env.local
+```
+
+Despues, abre `.env.local` y reemplaza los valores de ejemplo por tus datos reales de Supabase y de acceso admin.
+
+Variables esperadas en `.env.local`:
+
+```dotenv
+# Supabase publico
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+
+# Supabase privado (admin)
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+
+# Buckets de storage
+NEXT_PUBLIC_SUPABASE_MENU_IMAGES_BUCKET=menu-images
+NEXT_PUBLIC_SUPABASE_MENU_ITEM_VIDEOS_BUCKET=menu-item-videos
+
+# Acceso admin
+ADMIN_USERNAME=
+ADMIN_PASSWORD=
+ADMIN_SESSION_SECRET=
+
+# Compatibilidad local
+BACKEND_INTERNAL_URL=http://localhost:8000
+```
+
+Nota: no subas `.env.local` al repositorio.
+
+## Acceso a /admin (credenciales basicas)
+
+La ruta `/admin` usa credenciales basicas definidas en estas variables:
+
+- `ADMIN_USERNAME`
+- `ADMIN_PASSWORD`
+
+Debes configurar ambas en `.env.local` para poder iniciar sesion en el panel.
+
+`ADMIN_SESSION_SECRET` tambien es obligatoria para firmar la sesion de admin.
+
+## Preparar base de datos y storage (Supabase)
+
+Ejecuta los scripts SQL en este orden desde el SQL Editor de Supabase:
+
+1. `sql/001_schema.sql`
+2. `sql/002_rls_policies.sql`
+3. `sql/003_seed.sql`
+4. `sql/004_fix_admin_users_rls_recursion.sql`
+5. `sql/005_storage_menu_images.sql`
+6. `sql/006_i18n_content_schema.sql`
+7. `sql/007_menu_items_schema.sql`
+8. `sql/008_storage_menu_item_videos.sql`
+
+Con eso quedaran listas las tablas, politicas y buckets necesarios.
+
+## Rutas principales
+
+- `/` Home principal (redirige a experiencia social)
+- `/social` Landing con carrusel de categorias
+- `/[...slug]` Detalle de categoria/platos
+- `/admin` Panel de administracion
+- `/admin/menu-cards/[cardId]` Gestion de platos por categoria
+
+## Recomendacion para videos de platos
+
+- Duracion recomendada: alrededor de 5 segundos por plato.
+- Formato recomendado: video vertical corto para carga rapida y mejor experiencia movil.
+- Ubicacion: bucket `NEXT_PUBLIC_SUPABASE_MENU_ITEM_VIDEOS_BUCKET` en Supabase Storage.
+
+## Idiomas
+
+- Selector de idioma en la home.
+- Modo automatico (segun navegador) y modo manual.
+- Persistencia en `localStorage` y query param `lang`.
 
 Ejemplos:
 
@@ -53,23 +160,35 @@ Ejemplos:
 - `/?lang=es`
 - `/?lang=fr`
 
-## Esquema SQL para contenido multidioma
+## Scripts disponibles
 
-Para preparar traducciones de contenido dinamico en Supabase, ejecutar:
+- `npm run dev` Inicia entorno de desarrollo.
+- `npm run build` Genera build de produccion.
+- `npm run start` Arranca la build en modo produccion.
+- `npm run lint` Ejecuta linting.
 
-- `sql/006_i18n_content_schema.sql`
+## Despliegue en Vercel
 
-## Subcategorias de platos y videos
+1. Conecta el repositorio correcto en Vercel (Settings > Git).
+2. Define todas las variables de entorno del bloque anterior en el proyecto de Vercel.
+3. Lanza deploy desde rama `main`.
 
-Para habilitar platos dentro de cada categoria y guardar videos verticales en Supabase, ejecutar tambien:
+Si aparece un error de build por TypeScript, revisa primero que Vercel este leyendo el repositorio y rama correctos.
 
-- `sql/007_menu_items_schema.sql`
-- `sql/008_storage_menu_item_videos.sql`
+## Estructura breve
 
-En `/admin`, cada `Menu Card` incluye ahora una subseccion para crear un numero indeterminado de platos con:
+- `src/app` Rutas y vistas (home, social, admin, detalle).
+- `src/lib` Clientes y acceso a datos de Supabase.
+- `src/video` Recursos de video del proyecto.
+- `sql` Scripts de base de datos y storage.
+- `doc` Notas tecnicas de apoyo.
 
-- titulo
-- descripcion
-- video vertical
-- orden
-- estado activo
+## Estado del proyecto
+
+Proyecto funcional para carta digital con gestion de contenido y despliegue en Vercel.
+
+Siguiente evolucion recomendada:
+
+- CI con validacion automatica de build y lint.
+- Tests de componentes y flujo admin.
+- Hardening de seguridad y permisos por rol.

@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 function getSupabaseHostname() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
 
   if (!supabaseUrl) {
     return null;
@@ -35,6 +35,9 @@ if (supabaseHostname) {
 }
 
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL ?? "",
+  },
   allowedDevOrigins: ["169.254.83.107"],
   turbopack: {
     root: process.cwd(),
