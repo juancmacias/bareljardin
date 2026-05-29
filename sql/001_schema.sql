@@ -16,6 +16,7 @@ $$;
 create table if not exists public.site_settings (
   id uuid primary key default gen_random_uuid(),
   business_name text not null,
+  logo_url text,
   address_line_1 text not null,
   address_line_2 text,
   phone text not null,

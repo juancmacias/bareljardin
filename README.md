@@ -1,4 +1,4 @@
-# Bar El Jardin - Carta Digital
+# Bar restaurante - Carta Digital
 
 Aplicacion web para gestionar y mostrar la carta digital de un restaurante.
 
@@ -85,25 +85,46 @@ Despues, abre `.env.local` y reemplaza los valores de ejemplo por tus datos real
 Variables esperadas en `.env.local`:
 
 ```dotenv
-# Supabase publico
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
+# ==============================
+# Supabase (public, client-side)
+# ==============================
+# Required. Example: https://your-project-id.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
 
-# Supabase privado (admin)
-SUPABASE_URL=
-SUPABASE_SERVICE_ROLE_KEY=
+# Required. Public anon key from Supabase (Settings > API)
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 
-# Buckets de storage
+# Optional. Bucket for category images (default: menu-images)
 NEXT_PUBLIC_SUPABASE_MENU_IMAGES_BUCKET=menu-images
+
+# Optional. Bucket for menu item videos (default: menu-item-videos)
 NEXT_PUBLIC_SUPABASE_MENU_ITEM_VIDEOS_BUCKET=menu-item-videos
 
-# Acceso admin
-ADMIN_USERNAME=
-ADMIN_PASSWORD=
-ADMIN_SESSION_SECRET=
+# ==============================
+# Supabase (server/admin)
+# ==============================
+# Required for admin operations
+SUPABASE_URL=https://YOUR_PROJECT.supabase.co
 
-# Compatibilidad local
+# Required for admin operations (service_role)
+SUPABASE_SERVICE_ROLE_KEY=YOUR_SUPABASE_SERVICE_ROLE_KEY
+
+# ==============================
+# Admin access
+# ==============================
+# Credentials used by /admin
+ADMIN_USERNAME=admin  # You can change this to any username you want
+ADMIN_PASSWORD=admin123  # Change this to a strong password
+
+# Required. Long random string for session signing
+ADMIN_SESSION_SECRET=YOUR_LONG_RANDOM_SESSION_SECRET
+
+# ==============================
+# Local compatibility
+# ==============================
+# Optional in local environments
 BACKEND_INTERNAL_URL=http://localhost:8000
+
 ```
 
 Nota: no subas `.env.local` al repositorio.
@@ -131,6 +152,7 @@ Ejecuta los scripts SQL en este orden desde el SQL Editor de Supabase:
 6. `sql/006_i18n_content_schema.sql`
 7. `sql/007_menu_items_schema.sql`
 8. `sql/008_storage_menu_item_videos.sql`
+9. `sql/009_site_settings_logo_url.sql`
 
 Con eso quedaran listas las tablas, politicas y buckets necesarios.
 

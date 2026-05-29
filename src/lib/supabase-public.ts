@@ -1,6 +1,7 @@
 export type SiteSettings = {
   id: string;
   business_name: string;
+  logo_url: string | null;
   address_line_1: string;
   address_line_2: string | null;
   phone: string;

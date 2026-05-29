@@ -54,6 +54,9 @@ type ImagePickerTarget =
     }
   | {
       kind: "new-card";
+    }
+  | {
+      kind: "site-logo";
     };
 
 const menuImagesBucket = process.env.NEXT_PUBLIC_SUPABASE_MENU_IMAGES_BUCKET || "menu-images";
@@ -89,6 +92,7 @@ function createEmptyTestimonialI18nByLang(): TestimonialI18nByLang {
 const emptySiteSettings: SiteSettings = {
   id: "",
   business_name: "",
+  logo_url: "",
   address_line_1: "",
   address_line_2: "",
   phone: "",
@@ -261,12 +265,21 @@ export default function AdminPage() {
       return card?.image_url ?? "";
     }
 
+    if (target.kind === "site-logo") {
+      return siteSettings.logo_url ?? "";
+    }
+
     return newMenuCard.image_url;
   }
 
   function applyImageUrlToTarget(target: ImagePickerTarget, imageUrl: string) {
     if (target.kind === "existing-card") {
       setCardImageUrl(target.cardId, imageUrl);
+      return;
+    }
+
+    if (target.kind === "site-logo") {
+      setSiteSettings((prev) => ({ ...prev, logo_url: imageUrl }));
       return;
     }
 
@@ -703,6 +716,7 @@ export default function AdminPage() {
 
       const payload = {
         business_name: siteSettings.business_name,
+        logo_url: siteSettings.logo_url || null,
         address_line_1: siteSettings.address_line_1,
         address_line_2: siteSettings.address_line_2 || null,
         phone: siteSettings.phone,
@@ -882,7 +896,12 @@ export default function AdminPage() {
     }
   }
 
-  const pickerTargetLabel = imagePickerTarget?.kind === "existing-card" ? "tarjeta" : "nueva tarjeta";
+  const pickerTargetLabel =
+    imagePickerTarget?.kind === "existing-card"
+      ? "tarjeta"
+      : imagePickerTarget?.kind === "site-logo"
+        ? "logo del sitio"
+        : "nueva tarjeta";
   const isUploadingForPicker = imagePickerTarget ? uploadingTarget === getTargetKey(imagePickerTarget) : false;
 
   if (isBooting) {
@@ -988,6 +1007,12 @@ export default function AdminPage() {
               className="rounded-xl border border-white/15 bg-black/30 px-3 py-2 text-sm"
             />
             <input
+              value={siteSettings.logo_url ?? ""}
+              onChange={(event) => setSiteSettings((prev) => ({ ...prev, logo_url: event.target.value }))}
+              placeholder="Logo URL"
+              className="rounded-xl border border-white/15 bg-black/30 px-3 py-2 text-sm"
+            />
+            <input
               value={siteSettings.phone}
               onChange={(event) => setSiteSettings((prev) => ({ ...prev, phone: event.target.value }))}
               placeholder="Telefono"
@@ -1018,6 +1043,30 @@ export default function AdminPage() {
               className="rounded-xl border border-white/15 bg-black/30 px-3 py-2 text-sm"
             />
           </div>
+
+          <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-3">
+            <p className="text-xs text-zinc-400">Logo desde Supabase Storage</p>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  void openImagePicker({ kind: "site-logo" });
+                }}
+                className="rounded-full border border-amber-300/40 bg-amber-500/15 px-3 py-1 text-xs font-semibold text-amber-100"
+              >
+                Seleccionar/subir logo
+              </button>
+            </div>
+            {siteSettings.logo_url ? (
+              <img
+                src={siteSettings.logo_url}
+                alt="Logo del sitio"
+                className="mt-3 h-16 w-auto rounded-lg object-contain"
+                loading="lazy"
+              />
+            ) : null}
+          </div>
+
           <button
             type="button"
             onClick={() => void saveSiteSettings()}

@@ -233,9 +233,10 @@ export default function SocialPage() {
     };
   };
 
-  const contactPhone = content.siteSettings?.phone ?? "+34 646 75 00 31";
-  const addressLine1 = content.siteSettings?.address_line_1 ?? "C. Fernando Díaz de Mendoza, 67";
-  const addressLine2 = content.siteSettings?.address_line_2 ?? "Carabanchel, 28019 Madrid";
+  const contactPhone = content.siteSettings?.phone ?? "+34 111 11 11 11";
+  const addressLine1 = content.siteSettings?.address_line_1 ?? "C. de la alegría, 18";
+  const addressLine2 = content.siteSettings?.address_line_2 ?? "Carabanchel, 28000 Madrid";
+  const siteLogoImage = content.siteSettings?.logo_url || logoImage;
   const reservationHref = `tel:${contactPhone.replace(/\s+/g, "")}`;
   const selectedLanguagePreference = useSyncExternalStore(
     subscribeToLanguageSelection,
@@ -370,12 +371,14 @@ export default function SocialPage() {
       {localeBadge}
       <section className="mx-auto w-[min(1220px,96vw)]" aria-label="Social Carousel">
         <header className="mb-2 w-full md:mb-3">
-          <h1 className="sr-only">Carta Digital</h1>
+          <h1 className="sr-only">{content.siteSettings?.business_name || "Carta Digital"}</h1>
           <Image
-            src={logoImage}
-            alt="Logo Carta Digital"
+            src={siteLogoImage}
+            alt={content.siteSettings?.business_name ? `Logo ${content.siteSettings.business_name}` : "Logo Carta Digital"}
             className="h-auto w-[130px] sm:w-[150px] md:w-[170px]"
             priority
+            width={170}
+            height={95}
           />
         </header>
 
