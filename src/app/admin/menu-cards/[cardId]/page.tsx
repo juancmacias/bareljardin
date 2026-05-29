@@ -101,6 +101,7 @@ export default function MenuCardDetailAdminPage() {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [newMenuItem, setNewMenuItem] = useState<MenuItem>(createEmptyMenuItem(cardId));
   const [menuVideoAssets, setMenuVideoAssets] = useState<MenuVideoAsset[]>([]);
+  const [isLoadingMenuVideoAssets, setIsLoadingMenuVideoAssets] = useState(false);
   const [uploadingMenuItemVideoTarget, setUploadingMenuItemVideoTarget] = useState<string | null>(null);
 
   const getMenuVideoPublicUrl = useCallback(
