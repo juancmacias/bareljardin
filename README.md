@@ -152,7 +152,11 @@ Ejecuta los scripts SQL en este orden desde el SQL Editor de Supabase:
 6. `sql/006_i18n_content_schema.sql`
 7. `sql/007_menu_items_schema.sql`
 8. `sql/008_storage_menu_item_videos.sql`
-9. `sql/009_site_settings_logo_url.sql`
+
+Nota sobre logo dinamico:
+
+- Si creas la base desde cero con el `001_schema.sql` actual, no necesitas ejecutar `sql/009_site_settings_logo_url.sql`.
+- `sql/009_site_settings_logo_url.sql` solo es para bases existentes creadas antes de agregar `logo_url` en `site_settings`.
 
 Con eso quedaran listas las tablas, politicas y buckets necesarios.
 
